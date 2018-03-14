@@ -88,7 +88,7 @@ public class WordSearch
             {
                 break;
             }
-            words[i] = next;
+            words[i] = next.replaceAll("\\s+","");
         }
 
         WordSearch puzzle = new WordSearch(title, words);
