@@ -9,6 +9,7 @@ public class WordSearch
     private int column;
     private char[][] grid;
     private static final int max = 10; // max input words-- may change when size changes
+    private static final char[] sym = {'~', '!', '@', '#', '$', '%', '^', '&', ',', '.', '?', ':', ';', '<', '>', '/', '|', '(', ')', '`'}; // actual maximum 20 words
 
     public WordSearch(String title, String[] words)
     {
@@ -59,9 +60,24 @@ public class WordSearch
             int len = wor.length();
             int ro = 0;  // starting point
             int col = 0; // starting point
+            int a;
+
+            char[][][] diffs = new char[max][row][column]; // shows different words as different symbols, a copy (first brackets) is kept for each additional word
+            {
+                for (int l = 0; l < max; l++)
+                {
+                    for (int m = 0; m < row; m++)
+                    {
+                        for (int n = 0; n < column; n++)
+                        {
+                            diffs[l][m][n] = '*';
+                        }
+                    }
+                }
+            }
         do
         {
-            int a = rand.nextInt(8);
+            a = rand.nextInt(8);
 //              a = 7; // for testing
             switch (a)
             {
@@ -71,6 +87,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro][col + j] = wor.charAt(j);
+                        diffs[i][ro][col + j] = sym[i];
                     }
                     break;
                 case 1: // left
@@ -80,6 +97,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro][col + j] = wor.charAt(j);
+                        diffs[i][ro][col + j] = sym[i];
                     }
                     break;
                 case 2: // down
@@ -88,6 +106,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro + j][col] = wor.charAt(j);
+                        diffs[i][ro + j][col] = sym[i];
                     }
                     break;
                 case 3: // up
@@ -97,6 +116,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro + j][col] = wor.charAt(j);
+                        diffs[i][ro + j][col] = sym[i];
                     }
                     break;
                 case 4: // down right
@@ -105,6 +125,7 @@ public class WordSearch
                     for (int j = 0; j  < len; j++)
                     {
                         temp[ro + j][col + j] = wor.charAt(j);
+                        diffs[i][ro + j][col + j] = sym[i];
                     }
                     break;
                 case 5: // up left
@@ -114,6 +135,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro + j][col + j] = wor.charAt(j);
+                        diffs[i][ro + j][col + j] = sym[i];
                     }
                     break;
                 case 6: // up right
@@ -122,6 +144,7 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro - j][col + j] = wor.charAt(j);
+                        diffs[i][ro - j][col + j] = sym[i];
                     }
                     break;
                 case 7: // down left
@@ -131,24 +154,56 @@ public class WordSearch
                     for (int j = 0; j < len; j++)
                     {
                         temp[ro - j][col + j] = wor.charAt(j);
+                        diffs[i][ro - j][col + j] = sym[i];
                     }
                     break;
             }
-        }while(checkOverlap(wor, grid, temp, ro, col));
+        }while(checkOverlap(a, len, grid, temp, diffs, ro, col));
         grid = temp;
         }
     }
-    public boolean checkOverlap(String word, char[][] grid, char[][] temp, int rstart, int cstart) // method to check whether overlap is okay
+    public boolean checkOverlap(int a, int len, char[][] grid, char[][] temp, char[][][] diffs, int rstart, int cstart) // method to check whether overlap is okay
     {
-        int count;
-        if (count > 1)
-        {
-            return true;
-        }
-        else if (count == 1)
-        {
-            return false;
-        }
+//        int count = 0;
+//        char over;
+//        for (int i = 0; i < row; i++)
+//        {
+//            for (int j = 0; j < column; j++)
+//            {
+//                if (temp[i][j] != '*')
+//                {
+//                    if (temp[i][j] == grid[i][j])
+//                    {
+//                        count++;
+//                        over = temp[i][j];
+//                    }
+//                }
+//            }
+//        }
+//        if (count > 1)
+//        {
+//            return true;
+//        }
+//        else if (count == 1)
+//        {
+//            if (a <= 1)
+//            {
+//                // check for right and left
+//            }
+//            else if (a == 2 || a == 3)
+//            {
+//                // check for up and down
+//            }
+//            else if (a == 4 || a == 5)
+//            {
+//                // check for diagonal
+//            }
+//            else
+//            {
+//                // check for other diagonal
+//            }
+//            return false; // check to see if overlap is valid
+//        }
         return false;
     }
     public String reverse(String forward) // reverses words for use in cases 1, 3, 5, 6, 7
