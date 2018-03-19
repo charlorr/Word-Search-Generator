@@ -53,86 +53,102 @@ public class WordSearch
         Random rand = new Random();
         for (int i = 0; i < words.length; i++)
         {
+            char[][] temp;
+            temp = grid;
             String wor = words[i];
-            int a = rand.nextInt(8); // change back to 8
             int len = wor.length();
-//            a = 7; // for testing
+            int ro = 0;  // starting point
+            int col = 0; // starting point
+        do
+        {
+            int a = rand.nextInt(8);
+//              a = 7; // for testing
             switch (a)
             {
                 case 0: // right
-                        int ro = rand.nextInt(row); // random row
-                        int col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    ro = rand.nextInt(row); // random row
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro][col + j] = wor.charAt(j);
+                    }
+                    break;
                 case 1: // left
-                        wor = reverse(wor);
-                        ro = rand.nextInt(row); // random row
-                        col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    wor = reverse(wor);
+                    ro = rand.nextInt(row); // random row
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro][col + j] = wor.charAt(j);
+                    }
+                    break;
                 case 2: // down
-                        ro = rand.nextInt(row - len + 1); // random row
-                        col = rand.nextInt(column);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro + j][col] = wor.charAt(j);
-                        }
-                        break;
+                    ro = rand.nextInt(row - len + 1); // random row
+                    col = rand.nextInt(column);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro + j][col] = wor.charAt(j);
+                    }
+                    break;
                 case 3: // up
-                        wor = reverse(wor);
-                        ro = rand.nextInt(row - len + 1); // random row
-                        col = rand.nextInt(column);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro + j][col] = wor.charAt(j);
-                        }
-                        break;
+                    wor = reverse(wor);
+                    ro = rand.nextInt(row - len + 1); // random row
+                    col = rand.nextInt(column);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro + j][col] = wor.charAt(j);
+                    }
+                    break;
                 case 4: // down right
-                        ro = rand.nextInt(row - len + 1);
-                        col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j  < len; j++)
-                        {
-                            grid[ro + j][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    ro = rand.nextInt(row - len + 1);
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j  < len; j++)
+                    {
+                        temp[ro + j][col + j] = wor.charAt(j);
+                    }
+                    break;
                 case 5: // up left
-                        wor = reverse(wor);
-                        ro = rand.nextInt(row - len + 1);
-                        col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro + j][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    wor = reverse(wor);
+                    ro = rand.nextInt(row - len + 1);
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro + j][col + j] = wor.charAt(j);
+                    }
+                    break;
                 case 6: // up right
-                        ro = rand.nextInt(row - len + 1) + len - 1;
-                        col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro - j][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    ro = rand.nextInt(row - len + 1) + len - 1;
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro - j][col + j] = wor.charAt(j);
+                    }
+                    break;
                 case 7: // down left
-                        wor = reverse(wor);
-                        ro = rand.nextInt(row - len + 1) + len - 1;
-                        col = rand.nextInt(column - len + 1);
-                        for (int j = 0; j < len; j++)
-                        {
-                            grid[ro - j][col + j] = wor.charAt(j);
-                        }
-                        break;
+                    wor = reverse(wor);
+                    ro = rand.nextInt(row - len + 1) + len - 1;
+                    col = rand.nextInt(column - len + 1);
+                    for (int j = 0; j < len; j++)
+                    {
+                        temp[ro - j][col + j] = wor.charAt(j);
+                    }
+                    break;
             }
+        }while(checkOverlap(wor, grid, temp, ro, col));
+        grid = temp;
         }
-
     }
-    public boolean checkOverlap(String word, char[][] grid, int rstart, int cstart) // method to check whether overlap is okay
+    public boolean checkOverlap(String word, char[][] grid, char[][] temp, int rstart, int cstart) // method to check whether overlap is okay
     {
+        int count;
+        if (count > 1)
+        {
+            return true;
+        }
+        else if (count == 1)
+        {
+            return false;
+        }
         return false;
     }
     public String reverse(String forward) // reverses words for use in cases 1, 3, 5, 6, 7
