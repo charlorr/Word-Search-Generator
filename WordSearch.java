@@ -1,279 +1,277 @@
 import java.util.Random;
 import java.util.Scanner;
+    
+public class WordSearch {
 
-public class WordSearch
-{
     private String title;
     private String[] words;
     private int row;
     private int column;
     private char[][] grid;
     private static final int max = 10; // max input words-- may change when size changes
-    private static final char[] sym = {'~', '!', '@', '#', '$', '%', '^', '&', ',', '.', '?', ':', ';', '<', '>', '/', '|', '(', ')', '`'}; // actual maximum 20 words
 
-    public WordSearch(String title, String[] words)
-    {
+    /*
+     *  Constructor for WordSearch object of default size.
+     */
+
+    public WordSearch(String title, String[] words) {
+
         this.title = title;
         this.words = words;
         this.row = 10;
         this.column = 10;
     }
-    public WordSearch(String title, String[] words, int row, int column)
-    {
+
+    /*
+     *  Constructor for WordSearch object of custom size.
+     */
+
+    public WordSearch(String title, String[] words, int row, int column) {
+
         this(title, words);
         this.row = row;
         this.column = column;
     }
-    public void inputWindow() // From swing stuff
-    {
 
-    }
-    public void createPuzzle()
-    {
-        if (!title.equals(""))
-        {
+    /*
+     *  Prints title of puzzle and creates blank grid of specified size.
+     */
+
+    public void createPuzzle() {
+
+        if (!title.equals("")) {
             String pad = "";
             int b = (19 - title.length()) / 2;
-            for (int i = 0; i < b; i++)
-            {
+            for (int i = 0; i < b; i++) {
                 pad += " ";
             }
             System.out.printf("%s%s%s \n", pad, title, pad);
         }
         grid = new char[row][column];
-        for (int i = 0; i < row; i++)
-        {
-            for (int j = 0; j < column; j++)
-            {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
                 grid[i][j] = '*';
             }
         }
     }
-    public void placeWords()
-    {
-        Random rand = new Random();
-        for (int i = 0; i < words.length; i++)
-        {
-            char[][] temp;
-            temp = grid;
-            String wor = words[i];
-            int len = wor.length();
-            int ro = 0;  // starting point
-            int col = 0; // starting point
-            int a;
 
-            char[][][] diffs = new char[max][row][column]; // shows different words as different symbols, a copy (first brackets) is kept for each additional word
-            {
-                for (int l = 0; l < max; l++)
-                {
-                    for (int m = 0; m < row; m++)
-                    {
-                        for (int n = 0; n < column; n++)
-                        {
-                            diffs[l][m][n] = '*';
+    /*
+     *  Randomly orients and places words with respect to overlap.
+     */
+
+    public void placeWords() {
+
+        for (int i = 0; i < words.length; i++) {
+            char[][] temp;
+            int startRow = 0;  // starting point
+            int startCol = 0; // starting point
+
+            boolean invalid = false;
+
+            do {
+                String word = words[i];
+                temp = grid;
+                invalid = false;
+                Random rand = new Random();
+                int orient = rand.nextInt(4); // Change this back to 8 after testing
+
+                /*
+                 *  Where orient signifies:
+                 *  0 -- right
+                 *  1 -- left
+                 *  2 -- down
+                 *  3 -- up
+                 *  4 -- down right
+                 *  5 -- up left
+                 *  6 -- up right
+                 *  7 -- down left
+                 */
+
+                if (orient % 2 == 1)
+                    word = reverse(word);
+
+                /* Horizontal */
+
+                if (orient < 2) {
+                    startRow = rand.nextInt(row); // random row
+                    startCol = rand.nextInt(column - word.length() + 1);
+                    for (int j = 0; j < word.length() && !invalid; j++) {
+                        if (temp[startRow][startCol + j] != '*' && temp[startRow][startCol + j] != word.charAt(j)) {
+                            invalid = true;
                         }
+                        temp[startRow][startCol + j] = word.charAt(j);
                     }
                 }
-            }
-        do
-        {
-            a = rand.nextInt(8);
-//              a = 7; // for testing
-            switch (a)
-            {
-                case 0: // right
-                    ro = rand.nextInt(row); // random row
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro][col + j] = wor.charAt(j);
-                        diffs[i][ro][col + j] = sym[i];
+
+                /* Vertical */
+
+                else if (orient < 4) {
+                    startRow= rand.nextInt(row - word.length() + 1); // random row
+                    startCol = rand.nextInt(column);
+                    for (int j = 0; j < word.length(); j++) {
+                        if (temp[startRow + j][startCol] != '*' && temp[startRow + j][startCol] != word.charAt(j)) {
+                            invalid = true;
+                        }
+                        temp[startRow + j][startCol] = word.charAt(j);
                     }
-                    break;
-                case 1: // left
-                    wor = reverse(wor);
-                    ro = rand.nextInt(row); // random row
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro][col + j] = wor.charAt(j);
-                        diffs[i][ro][col + j] = sym[i];
-                    }
-                    break;
-                case 2: // down
-                    ro = rand.nextInt(row - len + 1); // random row
-                    col = rand.nextInt(column);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro + j][col] = wor.charAt(j);
-                        diffs[i][ro + j][col] = sym[i];
-                    }
-                    break;
-                case 3: // up
-                    wor = reverse(wor);
-                    ro = rand.nextInt(row - len + 1); // random row
-                    col = rand.nextInt(column);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro + j][col] = wor.charAt(j);
-                        diffs[i][ro + j][col] = sym[i];
-                    }
-                    break;
-                case 4: // down right
-                    ro = rand.nextInt(row - len + 1);
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j  < len; j++)
-                    {
-                        temp[ro + j][col + j] = wor.charAt(j);
-                        diffs[i][ro + j][col + j] = sym[i];
-                    }
-                    break;
-                case 5: // up left
-                    wor = reverse(wor);
-                    ro = rand.nextInt(row - len + 1);
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro + j][col + j] = wor.charAt(j);
-                        diffs[i][ro + j][col + j] = sym[i];
-                    }
-                    break;
-                case 6: // up right
-                    ro = rand.nextInt(row - len + 1) + len - 1;
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro - j][col + j] = wor.charAt(j);
-                        diffs[i][ro - j][col + j] = sym[i];
-                    }
-                    break;
-                case 7: // down left
-                    wor = reverse(wor);
-                    ro = rand.nextInt(row - len + 1) + len - 1;
-                    col = rand.nextInt(column - len + 1);
-                    for (int j = 0; j < len; j++)
-                    {
-                        temp[ro - j][col + j] = wor.charAt(j);
-                        diffs[i][ro - j][col + j] = sym[i];
-                    }
-                    break;
-            }
-        }while(checkOverlap(a, len, grid, temp, diffs, ro, col));
-        grid = temp;
+                }
+//
+//                switch (orient)
+//                {
+//                    case 0: // right
+//
+//                        break;
+//                    case 1: // left
+//                        startRow= rand.nextInt(row); // random row
+//                        col = rand.nextInt(column - word.length() + 1);
+//                        for (int j = 0; j < word.length(); j++) {
+//                            temp[startRow][col + j] = word.charAt(j);
+//                        }
+//                        break;
+//                    case 2: // down
+//
+//                        break;
+//                    case 3: // up
+//                        startRow= rand.nextInt(row - word.length() + 1); // random row
+//                        col = rand.nextInt(column);
+//                        for (int j = 0; j < word.length(); j++)
+//                        {
+//                            temp[startRow + j][col] = word.charAt(j);
+//                        }
+//                        break;
+//                    case 4: // down right
+//                        startRow= rand.nextInt(row - word.length() + 1);
+//                        col = rand.nextInt(column - word.length() + 1);
+//                        for (int j = 0; j  < word.length(); j++)
+//                        {
+//                            temp[startRow + j][col + j] = word.charAt(j);
+//                        }
+//                        break;
+//                    case 5: // up left
+//                        startRow= rand.nextInt(row - word.length() + 1);
+//                        col = rand.nextInt(column - word.length() + 1);
+//                        for (int j = 0; j < word.length(); j++)
+//                        {
+//                            temp[startRow + j][col + j] = word.charAt(j);
+//                        }
+//                        break;
+//                    case 6: // up right
+//                        startRow= rand.nextInt(row - word.length() + 1) + word.length() - 1;
+//                        col = rand.nextInt(column - word.length() + 1);
+//                        for (int j = 0; j < word.length(); j++)
+//                        {
+//                            temp[startRow - j][col + j] = word.charAt(j);
+//                        }
+//                        break;
+//                    case 7: // down left
+//                        startRow= rand.nextInt(row - word.length() + 1) + word.length() - 1;
+//                        col = rand.nextInt(column - word.length() + 1);
+//                        for (int j = 0; j < word.length(); j++)
+//                        {
+//                            temp[startRow - j][col + j] = word.charAt(j);
+//                        }
+//                        break;
+//                }
+                System.out.println();
+                System.out.println(word);
+                printPuzzle();
+                System.out.println();
+            } while(invalid);
+
+            grid = temp;
         }
     }
-    public boolean checkOverlap(int a, int len, char[][] grid, char[][] temp, char[][][] diffs, int rstart, int cstart) // method to check whether overlap is okay
-    {
-//        int count = 0;
-//        char over;
-//        for (int i = 0; i < row; i++)
-//        {
-//            for (int j = 0; j < column; j++)
-//            {
-//                if (temp[i][j] != '*')
-//                {
-//                    if (temp[i][j] == grid[i][j])
-//                    {
-//                        count++;
-//                        over = temp[i][j];
-//                    }
-//                }
-//            }
-//        }
-//        if (count > 1)
-//        {
-//            return true;
-//        }
-//        else if (count == 1)
-//        {
-//            if (a <= 1)
-//            {
-//                // check for right and left
-//            }
-//            else if (a == 2 || a == 3)
-//            {
-//                // check for up and down
-//            }
-//            else if (a == 4 || a == 5)
-//            {
-//                // check for diagonal
-//            }
-//            else
-//            {
-//                // check for other diagonal
-//            }
-//            return false; // check to see if overlap is valid
-//        }
-        return false;
-    }
-    public String reverse(String forward) // reverses words for use in cases 1, 3, 5, 6, 7
-    {
+
+    /*
+     *  Reverses words for use method placeWords().
+     */
+
+    public String reverse(String forward) {
         int len = forward.length();
         char[] back = new char[len];
         String backward = "";
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             back[i] = forward.charAt(len - 1 - i);
             backward += back[i];
         }
         return backward;
     }
-    public void fillRandom()
-    {
+
+    /*
+     *  Fills puzzle with random letters after words are placed.
+     */
+
+    public char[][] fillRandom() {
         Random rand = new Random();
-        for (int i = 0; i < row; i++)
-        {
-            for (int j = 0; j < column; j++)
-            {
-//                if (grid[i][j] == '*')
-//                {
-//                    int a = rand.nextInt(26) + 65;
-//                    char r = (char)a;
-//                    grid[i][j] = r;
-//                }
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (grid[i][j] == '*')
+                {
+                    int a = rand.nextInt(26) + 65;
+                    char r = (char)a;
+                    grid[i][j] = r;
+                }
+            }
+        }
+        return grid;
+    }
+
+    /*
+     *  Prints puzzle...
+     */
+
+    public void printPuzzle() {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
                 System.out.printf("%c ", grid[i][j]);
             }
             System.out.printf("\n");
         }
     }
-    public String[] copyArray(String[] array, int newlen)
-    {
-        String[] newarray = new String[newlen];
-        for (int i = 0; i < newlen; i++)
-        {
-            newarray[i] = array[i];
+
+    /*
+     *  Copies contents of array into new array.
+     */
+
+    public String[] copyArray(String[] array, int len) {
+
+        String[] newArray = new String[len];
+        for (int i = 0; i < len; i++) {
+            newArray[i] = array[i];
         }
-        return newarray;
+        return newArray;
     }
-    public char[][] copyArray(char[][] array, int r, int c) // change this because it's wrong
-    {
-        char[][] newarray = new char[r][c];
-        for (int i = 0; i < r; i++)
-        {
-            for (int j = 0; j < c; j++)
-            {
-                newarray[i][j] = array[i][j];
+
+    public char[][] copyArray(char[][] array, int size) {
+
+        char[][] newArray = new char[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                newArray[i][j] = array[i][j];
             }
         }
-        return newarray;
+        return newArray;
     }
-    public static void main(String[] args)
-    {
+
+    /*
+     *  Main!!
+     */
+
+    public static void main(String[] args) {
+
         Scanner s = new Scanner(System.in);
         String[] words = new String[max];
-        String title;
+        String title = "";
 
-        System.out.printf("Welcome to Charlene's Word Search Generator!\n");
-        System.out.printf("Title of word search (optional) :\n");
+        System.out.println("Welcome to Charlene's Word Search Generator!");
+        System.out.println("Title of word search (optional) : ");
         title = s.nextLine();
 
         System.out.printf("Enter a maximum of %d words: \n", max); // Change maximum based on size probs
         int count = 0; // counts true length of filled words array
-        for(int i = 0; i < max; i++)
-        {
+        for (int i = 0; i < max; i++) {
             String next = s.nextLine();
-            if (next.equals(""))
-            {
+            if (next.equals("")) {
                 break;
             }
             words[i] = next.toUpperCase().replaceAll("\\s+","");
@@ -282,8 +280,9 @@ public class WordSearch
         WordSearch puzzle = new WordSearch(title, words);
         puzzle.words = puzzle.copyArray(puzzle.words, count);
         System.out.println(puzzle.words.length);
-        puzzle.createPuzzle(); // places title and initializes grid w/ *'s
+        puzzle.createPuzzle();
         puzzle.placeWords();
-        puzzle.fillRandom(); // fills remaining stars and prints puzzle
+    //    puzzle.grid = puzzle.fillRandom();
+    //    puzzle.printPuzzle();
     }
 }
